@@ -37,6 +37,11 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.6.3
 uvicorn==0.42.0
+<<<<<<< HEAD
 uvloop==0.22.1
 watchfiles==1.1.1
 websockets==16.0
+=======
+watchfiles==1.1.1
+websockets==16.0
+>>>>>>> 24e12babd1be4bf8c2e43e98291f7b8245d9dff0
