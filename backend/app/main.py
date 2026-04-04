@@ -3,7 +3,7 @@ from app.database.connection import Base, engine
 
 from app.models.patient import PatientModel
 from app.models.queue import QueueModel
-from app.models.departement import DepartmentModel
+from app.models.department import DepartmentModel
 from app.models.user import UserModel
 
 from app.routes.patient_routes import patient_router
