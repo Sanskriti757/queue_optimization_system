@@ -27,7 +27,7 @@ env/
 
 # ------------------------------
 
-**pycache**/
+*pycache*/
 *.py[cod]
 *$py.class
 
@@ -127,3 +127,29 @@ uvicorn.log
 # migrations/
 
 # alembic/versions/
+
+# ------------------------------
+# Node.js / React / Vite
+# ------------------------------
+node_modules/
+frontend/node_modules/
+
+# Frontend build artifacts
+frontend/dist/
+.vite/
+frontend/.cache/
+
+# Package manager and tooling caches
+.npm/
+.pnpm-store/
+.yarn/
+.eslintcache
+
+# Tailwind/PostCSS cache (if created by tooling)
+*.cache
+
+# Frontend logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
