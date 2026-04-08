@@ -22,4 +22,4 @@ class PatientModel(Base):
     created_at = Column(DateTime)
 
     # 🔗 Relationship
-    queues = relationship("QueueModel", back_populates="patient")
+    # queues = relationship("QueueModel", back_populates="patient")
