@@ -20,3 +20,7 @@ def register_patient(patient_data:PatientSchema, db: Session):
     db.refresh(new_patient)
     # For now, we will just return the received data as a confirmation
     return {"message": "Patient registered successfully", "patient_data": patient_data}
+
+def show_patients(db: Session):
+    patients = db.query(PatientModel).all()
+    return patients

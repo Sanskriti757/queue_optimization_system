@@ -16,6 +16,6 @@ class QueueModel(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationships
-    patient = relationship("PatientModel", back_populates="queues")
-    department = relationship("DepartmentModel", back_populates="queues")
+    # # Relationships
+    # patient = relationship("PatientModel", back_populates="queues")
+    # department = relationship("DepartmentModel", back_populates="queues")
