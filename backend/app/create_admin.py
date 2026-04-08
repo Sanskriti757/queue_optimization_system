@@ -1,5 +1,6 @@
 from app.database.connection import Base, SessionLocal, engine
-from app.models.user import UserModel, User_Role
+from app.models  import user, department, queue
+from app.models.user import UserModel, UserRole
 from pwdlib import PasswordHash
 
 
@@ -15,7 +16,7 @@ def create_admin():
 
     try:
         name = input("Enter admin name: ")
-        email = input("Enter admin email: ")
+        email = input("Enter admin email: ").lower().strip()
         password = input("Enter admin password: ")
 
         existing_user = db.query(UserModel).filter(UserModel.email == email).first()
@@ -29,7 +30,7 @@ def create_admin():
             name=name,
             email=email,
             password=hashed_password,
-            role=User_Role.ADMIN,
+            role=UserRole.ADMIN,
         )
 
         db.add(new_admin)

@@ -1,7 +1,7 @@
-from fastapi import HTTPException,status,Request
-from app.schemas.user_schema import LoginSchema
+from fastapi import HTTPException,status,Request, Response
+from app.schemas.user_schema import LoginSchema, UserSchema
 from sqlalchemy.orm import Session
-from app.models.user import UserModel
+from app.models.user import UserModel, UserRole
 
 from datetime import datetime, timedelta
 from app.config import settings
@@ -13,40 +13,83 @@ from jwt.exceptions import InvalidTokenError
 
 password_hash = PasswordHash.recommended()
 
+def get_password_hash(password):
+    return password_hash.hash(password)
+
 
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
 
-# Logic to authenticate user and return a token or session
-def login_user(user_data: LoginSchema, db: Session):
+def create_user(user_data: UserSchema, db: Session):
     
-    user=db.query(UserModel).filter(UserModel.email == user_data.email).first()
+    email = user_data.email.lower().strip()
+    existing_user = db.query(UserModel).filter(UserModel.email == email).first()
+    
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    
+    if user_data.role == UserRole.DOCTOR and not user_data.department_id:
+        raise HTTPException(status_code=400, detail="Doctors must be assigned to a department")
+    
+    if user_data.role != UserRole.DOCTOR:
+        user_data.department_id = None
+
+    
+    hashed_password = get_password_hash(user_data.password)
+    
+    new_user = UserModel(
+        name=user_data.name,
+        email=email,
+        password=hashed_password,
+        role=user_data.role,
+        department_id=user_data.department_id
+    )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return new_user
+
+
+# Logic to authenticate user and return a token or session
+def login_user(user_data: LoginSchema, db: Session, response: Response):
+    
+    email = user_data.email.lower().strip()
+    user = db.query(UserModel).filter(UserModel.email == email).first()
+
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     
     if not verify_password(user_data.password, user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     
     exp_time = datetime.now() + timedelta(minutes=settings.EXP_TIME)
         
-    token=jwt.encode({"_id": user.user_id,"exp": exp_time.timestamp()}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    token=jwt.encode({
+        "_id": user.user_id,
+        "role": user.role.value,
+        "exp": exp_time
+        }, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False, # Set to True in production with HTTPS
+        samesite="lax"
+    )
 
-    return {"token": token}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "user_id": user.user_id,
+            "name": user.name,
+            "role": user.role.value,
+        }
+    }
 
-def is_authenticated(request:Request,db: Session):
-    try:
-        token = request.headers.get("Authorization")
-        if not token:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="you are not authorized")
-        
-        token = token.split(" ")[1]
-        data=jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id=data.get("_id")
-        
-        user = db.query(UserModel).filter(UserModel.user_id == user_id).first()
-        if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-        
-        return user
-    except InvalidTokenError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="you are not authorized")
+def logout_user(response: Response):
+    response.delete_cookie(key="access_token")
+    return {"message": "Logged out successfully"}
