@@ -33,8 +33,16 @@ def is_authenticated(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="you are not authorized")
 
 
+# function to check if the user logged in is an admin or not
 def require_admin(user: UserModel = Depends(is_authenticated)):
     if user.role != UserRole.ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+
+    return user
+
+# function to check is the user logged in is a triage nurse or not
+def require_triage(user: UserModel = Depends(is_authenticated)):
+    if user.role != UserRole.TRIAGE:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Triage access required")
 
     return user

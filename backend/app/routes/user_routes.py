@@ -24,3 +24,4 @@ def logout_user_endpoint(response: Response):
 @user_routes.get("/me",status_code=status.HTTP_200_OK)
 def get_current_user(user_data: UserModel = Depends(is_authenticated)):
     return user_data
+

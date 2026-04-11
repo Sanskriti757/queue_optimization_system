@@ -1,25 +1,37 @@
-import datetime
-
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from app.database.connection import Base
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
-# ye ek patient model hai jisme patient ki details store hongi database me
+from app.database.connection import Base
+
+
 class PatientModel(Base):
     __tablename__ = "patients"
 
-    patient_id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String, nullable=False)
-
     contact_number = Column(String, nullable=False)
     address = Column(String, nullable=True)
+    physical_disability = Column(Boolean, default=False)
+    
+    department_id = Column(Integer, ForeignKey("departments.department_id"), nullable=False)
 
-    disability = Column(Boolean, default=False)
+    symptoms = Column(String, nullable=True)
 
-    created_at = Column(DateTime)
+    body_temperature = Column(Float, nullable=True) #in fahrenheit
+    blood_pressure = Column(String, nullable=True)  # "120/80"
+    heart_rate = Column(Integer, nullable=True)
+    oxygen_lvl = Column(Integer, nullable=True)
 
-    # 🔗 Relationship
-    # queues = relationship("QueueModel", back_populates="patient")
+    priority_score = Column(Integer, default=0)
+    token_number = Column(Integer, nullable=True)
+    status = Column(String, default="WAITING")
+
+    assigned_doctor_id = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    department = relationship("DepartmentModel")
