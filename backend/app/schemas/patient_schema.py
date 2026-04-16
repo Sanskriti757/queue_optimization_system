@@ -6,13 +6,18 @@ class PatientSchema(BaseModel):
     age: int = Field(..., gt=0, lt=120)
     gender: str = Field(..., pattern="^(male|female|other)$")
 <<<<<<< HEAD
+<<<<<<< HEAD
     
 =======
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+    
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
     contact_number: str = Field(
         ..., 
         pattern=r'^\+?\d{10,15}$'
     )
+<<<<<<< HEAD
 <<<<<<< HEAD
     
     address: Optional[str] = None
@@ -28,3 +33,9 @@ class PatientSchema(BaseModel):
     oxygen_lvl: Optional[int] = Field(default=None, ge=0, le=100)
     department_id: int = Field(..., gt=0)
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+    
+    address: Optional[str] = None
+    
+    department_id: int = Field(..., gt=0)
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0

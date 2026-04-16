@@ -34,14 +34,18 @@ def is_authenticated(request: Request, db: Session = Depends(get_db)):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # function to check if the user logged in is an admin or not
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
 def require_admin(user: UserModel = Depends(is_authenticated)):
     if user.role != UserRole.ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
 
     return user
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 
@@ -52,3 +56,5 @@ def require_triage(user: UserModel = Depends(is_authenticated)):
 
     return user
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # yaha or hamara main code logic hoga jisme ham patient ko register karenge database me
 
 from app.models.patient import PatientModel
@@ -22,9 +23,15 @@ def register_patient(patient_data:PatientSchema, db: Session):
     # For now, we will just return the received data as a confirmation
     return {"message": "Patient registered successfully", "patient_data": patient_data}
 =======
+=======
+# yaha or hamara main code logic hoga jisme ham patient ko register karenge database me
+
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
 from app.models.patient import PatientModel
+from app.database.connection import get_db
 from app.schemas.patient_schema import PatientSchema
 from sqlalchemy.orm import Session
+<<<<<<< HEAD
 
 #Score body temperature in Fahrenheit. Inspired by NEWS2/MEWS ranges.
 def body_temp_score(temp: float) -> int:
@@ -118,6 +125,24 @@ def register_patient(patient_data: PatientSchema, db: Session):
     pass
 
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+# Logic to save patient data to the database
+def register_patient(patient_data:PatientSchema, db: Session):
+        
+    data=patient_data.model_dump()  # Convert Pydantic model to dictionary
+    new_patient = PatientModel(
+        name=data["name"],
+        age=data["age"],
+        gender=data["gender"],
+        contact_number=data["contact_number"],
+        address=data["address"]
+    )
+    db.add(new_patient)
+    db.commit()#save  krta h ye 
+    db.refresh(new_patient)
+    # For now, we will just return the received data as a confirmation
+    return {"message": "Patient registered successfully", "patient_data": patient_data}
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
 
 def show_patients(db: Session):
     patients = db.query(PatientModel).all()

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import datetime
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
@@ -14,19 +15,29 @@ class PatientModel(Base):
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+=======
+import datetime
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
 
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from app.database.connection import Base
+from sqlalchemy.orm import relationship
 
-
+# ye ek patient model hai jisme patient ki details store hongi database me
 class PatientModel(Base):
     __tablename__ = "patients"
 
+<<<<<<< HEAD
     patient_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+    patient_id = Column(Integer, primary_key=True, index=True)
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
 
     name = Column(String, nullable=False)
     age = Column(Integer, nullable=False)
     gender = Column(String, nullable=False)
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     contact_number = Column(String, nullable=False)
@@ -39,19 +50,17 @@ class PatientModel(Base):
     # 🔗 Relationship
     # queues = relationship("QueueModel", back_populates="patient")
 =======
+=======
+
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
     contact_number = Column(String, nullable=False)
     address = Column(String, nullable=True)
-    physical_disability = Column(Boolean, default=False)
-    
-    department_id = Column(Integer, ForeignKey("departments.department_id"), nullable=False)
 
-    symptoms = Column(String, nullable=True)
+    disability = Column(Boolean, default=False)
 
-    body_temperature = Column(Float, nullable=True) #in fahrenheit
-    blood_pressure = Column(String, nullable=True)  # "120/80"
-    heart_rate = Column(Integer, nullable=True)
-    oxygen_lvl = Column(Integer, nullable=True)
+    created_at = Column(DateTime)
 
+<<<<<<< HEAD
     priority_score = Column(Integer, default=0)
     token_number = Column(Integer, nullable=True)
     status = Column(String, default="WAITING")
@@ -62,3 +71,7 @@ class PatientModel(Base):
 
     department = relationship("DepartmentModel")
 >>>>>>> 3f35fff99f8bbe6cd1e6fc8a30ddae04af7f000e
+=======
+    # 🔗 Relationship
+    # queues = relationship("QueueModel", back_populates="patient")
+>>>>>>> 6a8f07514122fe700e1684947e6dc9254a692ac0
