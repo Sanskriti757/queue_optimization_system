@@ -1,5 +1,4 @@
 from app.database.connection import Base, SessionLocal, engine
-from app.models  import user, department, queue
 from app.models.user import UserModel, UserRole
 from pwdlib import PasswordHash
 
