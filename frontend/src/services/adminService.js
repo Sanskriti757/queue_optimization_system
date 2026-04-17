@@ -5,6 +5,11 @@ export const createUser = async (payload) => {
   return data
 }
 
+export const createDepartment = async (payload) => {
+  const { data } = await api.post('/department/create', payload)
+  return data
+}
+
 export const listUsers = async () => {
   const [doctors, triageNurses] = await Promise.all([getDoctors(), getTriageNurses()])
   return [...doctors, ...triageNurses]

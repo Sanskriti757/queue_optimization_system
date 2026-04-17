@@ -1,4 +1,4 @@
-import { Activity, ClipboardPlus, LayoutDashboard, ListOrdered, Stethoscope, UserPlus, Users } from 'lucide-react'
+import { Activity, Building2, ClipboardPlus, LayoutDashboard, ListOrdered, Stethoscope, UserPlus, Users } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { cn } from '../utils/helpers'
@@ -7,6 +7,7 @@ const menuByRole = {
   ADMIN: [
     { label: 'Dashboard', to: '/admin', icon: LayoutDashboard, end: true },
     { label: 'Create User', to: '/admin/create-user', icon: UserPlus },
+    { label: 'Departments', to: '/admin/departments', icon: Building2 },
     { label: 'Manage Users', to: '/admin/manage-users', icon: Users },
     { label: 'All Patients', to: '/admin/all-patients', icon: ListOrdered },
   ],
