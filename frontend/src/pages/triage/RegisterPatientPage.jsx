@@ -43,6 +43,8 @@ const getInputClass = (error) =>
     error ? 'border-red-400 focus:ring-2 focus:ring-red-200' : 'border-zinc-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10'
   }`
 
+const normalizeContactNumber = (contactNumber) => contactNumber.replace(/\D/g, '')
+
 const Field = ({ label, required, error, hint, children }) => (
   <div>
     <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-zinc-400">
@@ -89,10 +91,12 @@ function RegisterPatientPage() {
   const validateStep = (currentStep) => {
     const next = {}
     if (currentStep === 1) {
+      const contactNumber = normalizeContactNumber(values.contact_number)
       if (!values.name.trim()) next.name = 'Full name is required'
       if (!values.age || Number(values.age) < 1 || Number(values.age) > 120) next.age = 'Enter a valid age (1-120)'
       if (!values.gender) next.gender = 'Select a gender'
-      if (!values.contact_number.trim()) next.contact_number = 'Contact number is required'
+      if (!contactNumber) next.contact_number = 'Contact number is required'
+      else if (!/^\d{10,15}$/.test(contactNumber)) next.contact_number = 'Enter a valid contact number (10-15 digits)'
       if (!values.department_id) next.department_id = 'Select a department'
     }
     if (currentStep === 2 && !values.symptoms.trim()) next.symptoms = 'Describe the symptoms'
@@ -159,7 +163,7 @@ function RegisterPatientPage() {
         name: values.name.trim(),
         age: Number(values.age),
         gender: values.gender,
-        contact_number: values.contact_number.trim(),
+        contact_number: normalizeContactNumber(values.contact_number),
         symptoms: values.symptoms.trim(),
         department_id: Number(values.department_id),
         physical_disability: values.physical_disability,
