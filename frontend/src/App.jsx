@@ -1,105 +1,69 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
+import LoginPage from './pages/LoginPage.jsx'
+import DashboardLayout from './layouts/DashboardLayout.jsx'
+import ProtectedRoute from './routes/ProtectedRoute.jsx'
+import RoleRoute from './routes/RoleRoute.jsx'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
+import CreateUserPage from './pages/admin/CreateUserPage.jsx'
+import ManageUsersPage from './pages/admin/ManageUsersPage.jsx'
+import AdminAllPatientsPage from './pages/admin/AdminAllPatientsPage.jsx'
+import TriageDashboardPage from './pages/triage/TriageDashboardPage.jsx'
+import RegisterPatientPage from './pages/triage/RegisterPatientPage.jsx'
+import QueueViewPage from './pages/triage/QueueViewPage.jsx'
+import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage.jsx'
+import CurrentPatientPage from './pages/doctor/CurrentPatientPage.jsx'
+import QueueListPage from './pages/doctor/QueueListPage.jsx'
+import { useAuth } from './context/AuthContext.jsx'
+import ToastContainer from './components/ToastContainer.jsx'
 
-// Layouts
-import PublicLayout from './layouts/PublicLayout'
-import AuthLayout from './layouts/AuthLayout'
-import DashboardLayout from './layouts/DashboardLayout'
-
-// Pages
-import Home from './pages/Home'
-import Login from './pages/users/Login'
-import AdminDashboard from './pages/admin/Dashboard'
-import CreateUser from './pages/admin/CreateUser'
-import TriageDashboard from './pages/triage/Dashboard'
-import DoctorDashboard from './pages/doctor/Dashboard'
-
-// Protected Route Component
-const ProtectedRoute = ({ children, allowedRole }) => {
+function RoleHomeRedirect() {
   const { user } = useAuth()
-  
+
   if (!user) return <Navigate to="/login" replace />
-  if (allowedRole && user.role !== allowedRole) {
-    return <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />
-  }
-  return children
+  if (user.role === 'ADMIN') return <Navigate to="/admin" replace />
+  if (user.role === 'TRIAGE') return <Navigate to="/triage" replace />
+  return <Navigate to="/doctor" replace />
 }
 
-const App = () => {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return (
-      <div className="min-h-screen grid place-items-center text-sm text-gray-500">
-        Checking session...
-      </div>
-    )
-  }
-
+function App() {
   return (
-    <Routes>
-      {/* Public Routes - No Navbar/Login buttons */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Home />} />
-      </Route>
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
 
-      {/* Auth Routes - Login/Signup only */}
-      <Route element={<AuthLayout />}>
-        <Route 
-          path="/login" 
-          element={
-            !user ? <Login /> : <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />
-          } 
-        />
-      </Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<RoleHomeRedirect />} />
 
-      {/* Admin Routes */}
-      <Route element={<DashboardLayout />}>
-        <Route 
-          path="/admin/dashboard" 
-          element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <AdminDashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/admin/create-user" 
-          element={
-            <ProtectedRoute allowedRole="ADMIN">
-              <CreateUser />
-            </ProtectedRoute>
-          } 
-        />
-      </Route>
+          <Route element={<RoleRoute allowedRoles={['ADMIN']} />}>
+            <Route path="/admin" element={<DashboardLayout />}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="create-user" element={<CreateUserPage />} />
+              <Route path="manage-users" element={<ManageUsersPage />} />
+              <Route path="all-patients" element={<AdminAllPatientsPage />} />
+            </Route>
+          </Route>
 
-      {/* Triage Routes */}
-      <Route element={<DashboardLayout />}>
-        <Route 
-          path="/triage/dashboard" 
-          element={
-            <ProtectedRoute allowedRole="TRIAGE">
-              <TriageDashboard />
-            </ProtectedRoute>
-          } 
-        />
-      </Route>
+          <Route element={<RoleRoute allowedRoles={['TRIAGE']} />}>
+            <Route path="/triage" element={<DashboardLayout />}>
+              <Route index element={<TriageDashboardPage />} />
+              <Route path="register-patient" element={<RegisterPatientPage />} />
+              <Route path="queue" element={<QueueViewPage />} />
+            </Route>
+          </Route>
 
-      {/* Doctor Routes */}
-      <Route element={<DashboardLayout />}>
-        <Route 
-          path="/doctor/dashboard" 
-          element={
-            <ProtectedRoute allowedRole="DOCTOR">
-              <DoctorDashboard />
-            </ProtectedRoute>
-          } 
-        />
-      </Route>
+          <Route element={<RoleRoute allowedRoles={['DOCTOR']} />}>
+            <Route path="/doctor" element={<DashboardLayout />}>
+              <Route index element={<DoctorDashboardPage />} />
+              <Route path="current-patient" element={<CurrentPatientPage />} />
+              <Route path="queue" element={<QueueListPage />} />
+            </Route>
+          </Route>
+        </Route>
 
-      {/* 404 - Redirect to home */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <ToastContainer />
+    </>
   )
 }
 

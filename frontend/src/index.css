@@ -1,11 +1,21 @@
 @import "tailwindcss";
 
-/* Hide scrollbars globally while keeping scroll functionality */
-* {
-	-ms-overflow-style: none;
-	scrollbar-width: none;
+:root {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-*::-webkit-scrollbar {
-	display: none;
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+body {
+  @apply m-0 min-h-screen bg-zinc-100 text-zinc-700 antialiased;
+  background-image: radial-gradient(circle at top left, #f4f4f5 0, transparent 45%),
+    radial-gradient(circle at top right, #e4e4e7 0, transparent 40%);
+}
+
+#root {
+  @apply min-h-screen;
 }
