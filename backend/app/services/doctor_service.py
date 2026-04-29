@@ -69,3 +69,18 @@ def complete_treatment(
     db.commit()
     db.refresh(patient)
     return patient
+
+
+def requeue_treatment_patient(patient_id: int, doctor_id: int, db: Session):
+    patient = db.query(PatientModel).filter(PatientModel.patient_id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    if patient.assigned_doctor_id != doctor_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only update your assigned patients")
+    if patient.status != "IN_TREATMENT":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Patient is not in treatment")
+
+    patient.status = "WAITING"
+    db.commit()
+    db.refresh(patient)
+    return patient
