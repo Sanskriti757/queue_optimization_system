@@ -3,7 +3,7 @@ import Card from '../../components/Card'
 import Button from '../../components/Button'
 import Badge from '../../components/Badge'
 import { useAuth } from '../../context/AuthContext'
-import { getDoctorQueue, markPatientDone } from '../../services/doctorService'
+import { getDoctorQueue, markPatientDone, requeueCurrentPatient } from '../../services/doctorService'
 import { getErrorMessage, isHighPriority } from '../../utils/helpers'
 import { useToast } from '../../context/ToastContext'
 
@@ -13,6 +13,7 @@ function CurrentPatientPage() {
   const [queue, setQueue] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isMarking, setIsMarking] = useState(false)
+  const [isRequeueing, setIsRequeueing] = useState(false)
   const [consultation, setConsultation] = useState({
     diagnosis: '',
     prescribed_medicines: '',
@@ -82,6 +83,23 @@ function CurrentPatientPage() {
       addToast({ title: 'Unable to complete', description: getErrorMessage(error), variant: 'error' })
     } finally {
       setIsMarking(false)
+    }
+  }
+
+  const handleRequeue = async () => {
+    if (!currentPatient || !hasActiveTreatment) return
+    setIsRequeueing(true)
+    try {
+      await requeueCurrentPatient(currentPatient.patient_id)
+      addToast({
+        title: 'Patient moved back to waiting',
+        description: `${currentPatient.name} was requeued. You can call another patient now.`,
+      })
+      await fetchQueue()
+    } catch (error) {
+      addToast({ title: 'Unable to requeue patient', description: getErrorMessage(error), variant: 'error' })
+    } finally {
+      setIsRequeueing(false)
     }
   }
 
@@ -184,6 +202,9 @@ function CurrentPatientPage() {
             </div>
 
             <div className="flex flex-wrap justify-end gap-2">
+              <Button variant="secondary" onClick={handleRequeue} isLoading={isRequeueing} disabled={!currentPatient || !hasActiveTreatment || isMarking}>
+                Patient Not Available
+              </Button>
               <Button variant="danger" onClick={handleMarkDone} isLoading={isMarking} disabled={!currentPatient || !hasActiveTreatment}>
                 Complete Treatment & Save Notes
               </Button>

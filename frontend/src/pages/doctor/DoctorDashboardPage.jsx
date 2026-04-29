@@ -3,7 +3,7 @@ import { RefreshCw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Button from '../../components/Button'
-import { callNextPatient, getDoctorQueue } from '../../services/doctorService'
+import { callNextPatient, getDoctorQueue, requeueCurrentPatient } from '../../services/doctorService'
 import { useToast } from '../../context/ToastContext'
 
 const getPriorityConfig = () => ({ dot: 'bg-zinc-400', text: 'text-zinc-700' })
@@ -89,6 +89,26 @@ function DoctorDashboardPage() {
     navigate('/doctor/current-patient')
   }
 
+  const handleRequeueCurrentPatient = async () => {
+    if (!nowServing) return
+    setActionLoading((prev) => ({ ...prev, [nowServing.patient_id]: 'requeue' }))
+    setApiError('')
+
+    try {
+      await requeueCurrentPatient(nowServing.patient_id)
+      addToast({
+        title: 'Patient moved back to waiting',
+        description: `${nowServing.name} was requeued. You can call the next patient now.`,
+      })
+      await fetchQueue(true)
+    } catch (error) {
+      const message = error?.response?.data?.detail || error?.response?.data?.message || 'Action failed'
+      setApiError(typeof message === 'string' ? message : 'Action failed')
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [nowServing.patient_id]: '' }))
+    }
+  }
+
   const waitingQueue = useMemo(() => queue.filter((p) => p.status === 'WAITING'), [queue])
 
   const filteredQueue = useMemo(() => {
@@ -113,6 +133,7 @@ function DoctorDashboardPage() {
   const nowServing = queue.find((p) => p.status === 'IN_TREATMENT') || null
   const hasActiveTreatment = Boolean(nowServing)
   const nextInQueue = queue.filter((p) => p.status === 'WAITING').slice(0, 4)
+  const isRequeueingCurrent = Boolean(nowServing && actionLoading[nowServing.patient_id] === 'requeue')
 
   return (
     <div className="space-y-5">
@@ -203,6 +224,14 @@ function DoctorDashboardPage() {
                   className="w-full rounded-xl bg-zinc-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
                 >
                   Consult
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRequeueCurrentPatient}
+                  disabled={isRequeueingCurrent}
+                  className="mt-2 w-full rounded-xl border border-zinc-300 bg-white py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isRequeueingCurrent ? 'Requeueing…' : 'Patient Not Available'}
                 </button>
               </>
             ) : (
